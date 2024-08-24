@@ -1,0 +1,144 @@
+// ==UserScript==
+// @name         Remove Specific Keywords and Capitalize
+// @namespace    http://tampermonkey.net/
+// @version      3.0
+// @description  Removes specific keywords with commas including capitalizes. Please visit arjya404.netlify.app
+// @author       Arjya Sen
+// @match        :///*
+// @grant        none
+// ==/UserScript==
+
+(function() {
+    'use strict';
+
+    // Create and style the button
+    let button = document.createElement('button');
+    button.innerText = 'Clean';
+    button.className = 'cool-button';
+
+    document.body.appendChild(button);
+
+    // Add CSS for the button
+    const style = document.createElement('style');
+    style.innerHTML = `
+        .cool-button {
+        position: fixed;
+        top: 30px;
+        right: 50px;
+        z-index: 9999;
+        padding: 5px 10px;
+        font-size: 14px;
+        font-weight: bold;
+        color: #fff;
+        background: linear-gradient(45deg, #ff6b6b, #f06595);
+        border: none;
+        border-radius: 30px;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        cursor: pointer;
+        transition: all 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+        animation: pulse 1.5s infinite;
+        }
+
+        .cool-button:hover {
+        background: linear-gradient(45deg, #f06595, #ff6b6b);
+        box-shadow: 0 15px 25px rgba(0, 0, 0, 0.3);
+        transform: translateY(-5px) scale(1.1);
+        animation: hover-animation 0.5s forwards;
+        }
+
+        .cool-button:active {
+        background: linear-gradient(45deg, #e64980, #fa5252);
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        transform: translateY(0) scale(1);
+        animation: click-animation 0.3s forwards;
+        }
+
+        @keyframes pulse {
+        0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(240, 101, 149, 0.7);
+        }
+        70% {
+        transform: scale(1.05);
+        box-shadow: 0 0 15px rgba(240, 101, 149, 0.7);
+        }
+        100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(240, 101, 149, 0.7);
+        }
+        }
+
+        @keyframes hover-animation {
+        0% {
+        transform: scale(1);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+        100% {
+        transform: translateY(-5px) scale(1.1);
+        box-shadow: 0 15px 25px rgba(0, 0, 0, 0.3);
+        }
+        }
+
+        @keyframes click-animation {
+        0% {
+        transform: translateY(-5px) scale(1.1);
+        box-shadow: 0 15px 25px rgba(0, 0, 0, 0.3);
+        }
+        100% {
+        transform: translateY(0) scale(1);
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+        }
+
+        .sparkle {
+        position: absolute;
+        width: 5px;
+        height: 5px;
+        background: rgba(255, 215, 0, 0.8);
+        border-radius: 50%;
+        pointer-events: none;
+        animation: sparkle-animation 0.6s ease-out;
+        }
+
+        @keyframes sparkle-animation {
+        0% {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+        }
+        100% {
+        transform: scale(0.5) translateY(-30px);
+        opacity: 0;
+        }
+        }
+    `;
+    document.head.appendChild(style);
+
+    const keywords = ['uh', 'um', 'hm', 'hmm', 'huh', 'mm', 'mmm', 'mhm', 'mhms', 'ah', 'aha', 'AAA'];
+
+    // Function to remove keywords and their trailing commas
+    function removeKeywords(node) {
+        if (node.nodeType === Node.TEXT_NODE) {
+            let text = node.textContent;
+
+            // Remove keywords and any trailing commas
+            keywords.forEach(keyword => {
+                let regex = new RegExp(\\b${keyword}\\b,?\\s*, 'gi');
+                text = text.replace(regex, '');
+            });
+
+            // Capitalize words following sentence terminators
+            text = text.replace(/([.!?]\s+)([a-z])/g, function(match, separator, char) {
+                return separator + char.toUpperCase();
+            });
+
+            node.textContent = text;
+        } else {
+            // Recursively process child nodes
+            node.childNodes.forEach(removeKeywords);
+        }
+    }
+
+    button.addEventListener('click', function() {
+        removeKeywords(document.body);
+    });
+})();
